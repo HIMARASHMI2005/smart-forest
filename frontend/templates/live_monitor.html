@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Live Monitor — SmartForest{% endblock %}
+{% block body_class %}monitor-page{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📹 Live AI Detection Monitor</h1>
+  <p>Real-time person detection and face identification from webcam feed</p>
+</div>
+
+<div class="monitor-layout">
+  <!-- Left: Camera Feed -->
+  <div class="camera-panel card">
+    <div class="camera-header">
+      <h2>Camera Feed</h2>
+      <div class="camera-controls">
+        <button class="btn btn-primary" id="start-btn">▶ Start Detection</button>
+        <button class="btn btn-danger" id="stop-btn" disabled>⏹ Stop</button>
+        <button class="btn btn-outline" id="snapshot-btn" disabled>📸 Snapshot</button>
+      </div>
+    </div>
+
+    <div class="video-wrapper" id="video-wrapper">
+      <video id="webcam-video" autoplay muted playsinline></video>
+      <canvas id="detection-canvas"></canvas>
+      <div class="camera-overlay" id="camera-overlay">
+        <div class="camera-placeholder">
+          <div class="camera-icon">📷</div>
+          <p>Click <strong>Start Detection</strong> to activate webcam</p>
+          <p class="camera-note">Ensure you grant camera permissions</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detection Status Bar -->
+    <div class="detection-status-bar">
+      <div class="status-item">
+        <span class="status-label">Detection</span>
+        <span id="detect-status" class="status-badge badge-inactive">Inactive</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Model</span>
+        <span id="model-status" class="status-badge badge-info">Loading...</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Persons</span>
+        <span id="live-person-count" class="status-badge badge-info">0</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">FPS</span>
+        <span id="live-fps" class="status-badge badge-info">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Results Panel -->
+  <div class="results-panel">
+    <!-- Current Location -->
+    <div class="card gps-card">
+      <h3>📍 GPS Location</h3>
+      <button class="btn btn-outline btn-sm" id="get-location-btn">Get My Location</button>
+      <div id="location-display" class="location-display">
+        <div class="loc-row"><span>Latitude:</span><span id="loc-lat">—</span></div>
+        <div class="loc-row"><span>Longitude:</span><span id="loc-lon">—</span></div>
+        <div class="loc-row"><span>Zone:</span><span id="loc-zone">—</span></div>
+        <div class="loc-row"><span>Risk Level:</span><span id="loc-risk" class="risk-badge">—</span></div>
+      </div>
+    </div>
+
+    <!-- Detection Results -->
+    <div class="card detect-results-card">
+      <h3>🤖 AI Detection Results</h3>
+      <div id="detection-results" class="detection-results-list">
+        <p class="no-data-hint">No detections yet. Start the camera to begin.</p>
+      </div>
+    </div>
+
+    <!-- Face Identification Results -->
+    <div class="card face-results-card">
+      <h3>👤 Face Identification</h3>
+      <div id="face-results" class="face-results-list">
+        <p class="no-data-hint">Faces identified here during live detection.</p>
+      </div>
+    </div>
+
+    <!-- Live Alert Log -->
+    <div class="card alert-log-card">
+      <h3>⚠️ Live Alert Log</h3>
+      <div id="live-alerts" class="live-alert-list">
+        <p class="no-data-hint">Alerts will appear here in real time.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/monitor.js') }}"></script>
+{% endblock %}

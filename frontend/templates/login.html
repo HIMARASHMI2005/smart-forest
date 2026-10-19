@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Login — SmartForest{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">🌲</div>
+      <h1>Welcome Back</h1>
+      <p>Sign in to SmartForest Command Center</p>
+    </div>
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label for="login-email">Email Address</label>
+        <div class="input-wrapper">
+          <span class="input-icon">📧</span>
+          <input type="email" id="login-email" name="email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="field-error" id="err-email"></div>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="login-password" name="password" placeholder="Enter password" required autocomplete="current-password">
+          <button type="button" class="toggle-password" aria-label="Show password" onclick="togglePassword('login-password')">👁</button>
+        </div>
+        <div class="field-error" id="err-password"></div>
+      </div>
+      <div id="login-error" class="form-error-banner hidden"></div>
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn">
+        <span id="login-btn-text">Sign In</span>
+        <span id="login-spinner" class="spinner hidden"></span>
+      </button>
+    </form>
+    <div class="auth-footer">
+      <p>Don't have an account? <a href="/register" class="link-accent">Create one →</a></p>
+    </div>
+
+    <!-- Quick Test Credentials -->
+    <div class="demo-creds">
+      <p>🔑 <strong>Admin Demo:</strong> admin@smartforest.org / Admin@123</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("login-btn");
+  const spinner = document.getElementById("login-spinner");
+  const btnText = document.getElementById("login-btn-text");
+  const errBanner = document.getElementById("login-error");
+
+  // Clear previous errors
+  document.querySelectorAll(".field-error").forEach(el => el.textContent = "");
+  errBanner.classList.add("hidden");
+
+  const email    = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  if (!email) { document.getElementById("err-email").textContent = "Email is required."; return; }
+  if (!password) { document.getElementById("err-password").textContent = "Password is required."; return; }
+
+  btn.disabled = true; spinner.classList.remove("hidden"); btnText.textContent = "Signing in...";
+
+  try {
+    const res = await API.post("/api/auth/login", { email, password });
+    if (res.success) {
+      Auth.setSession(res.data.access_token, res.data.user);
+      Toast.success("Welcome back, " + res.data.user.name + "!");
+      setTimeout(() => {
+        window.location.href = res.data.user.role === "ADMIN" ? "/admin" : "/dashboard";
+      }, 700);
+    } else {
+      errBanner.textContent = res.message || "Login failed.";
+      errBanner.classList.remove("hidden");
+    }
+  } catch (err) {
+    errBanner.textContent = "Network error. Is the server running?";
+    errBanner.classList.remove("hidden");
+  }
+
+  btn.disabled = false; spinner.classList.add("hidden"); btnText.textContent = "Sign In";
+});
+
+function togglePassword(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === "password" ? "text" : "password";
+}
+</script>
+{% endblock %}

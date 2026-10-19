@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Register Face — SmartForest{% endblock %}
+{% block body_class %}face-page{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>👤 Face Registration</h1>
+  <p>Register your face with ForestFaceNet for personnel identification</p>
+</div>
+
+<div class="face-reg-layout">
+  <div class="card face-camera-card">
+    <h2>Capture Face Photo</h2>
+    <p class="hint-text">Position your face clearly in front of the camera, then click <strong>Capture & Register</strong>. Multiple captures improve accuracy.</p>
+
+    <div class="video-wrapper face-video-wrapper">
+      <video id="face-video" autoplay muted playsinline></video>
+      <canvas id="face-canvas" style="display:none"></canvas>
+      <div id="face-camera-overlay" class="camera-overlay">
+        <div class="face-guide-circle"></div>
+        <p class="face-guide-label">Align your face here</p>
+      </div>
+    </div>
+
+    <div class="face-controls">
+      <button class="btn btn-primary" id="start-face-cam-btn">📷 Start Camera</button>
+      <button class="btn btn-success" id="capture-register-btn" disabled>✅ Capture & Register</button>
+      <button class="btn btn-outline" id="stop-face-cam-btn" disabled>⏹ Stop</button>
+    </div>
+
+    <div id="face-reg-result" class="form-success-banner hidden"></div>
+    <div id="face-reg-error" class="form-error-banner hidden"></div>
+  </div>
+
+  <div class="card face-info-card">
+    <h3>📊 Registration Status</h3>
+    <div id="face-reg-status" class="face-status-display">
+      <div class="face-status-row">
+        <span>Samples Captured:</span>
+        <span id="samples-count" class="badge badge-info">0</span>
+      </div>
+      <div class="face-status-row">
+        <span>Face Model:</span>
+        <span id="face-model-status" class="badge">Loading...</span>
+      </div>
+      <div class="face-status-row">
+        <span>Registration:</span>
+        <span id="registration-status" class="badge">Not Registered</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <h3>💡 Tips for Best Results</h3>
+    <ul class="tips-list">
+      <li>✅ Use good, even lighting</li>
+      <li>✅ Face the camera directly</li>
+      <li>✅ Capture 3–5 samples for best accuracy</li>
+      <li>✅ Include slight left/right angle variations</li>
+      <li>❌ Avoid strong backlighting</li>
+      <li>❌ Remove sunglasses or hats</li>
+    </ul>
+
+    <div class="model-warning">
+      <p>⚠️ <strong>Important:</strong> ForestFaceNet must be trained before face registration is active. Contact the system administrator to initiate model training.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/face_register.js') }}"></script>
+{% endblock %}

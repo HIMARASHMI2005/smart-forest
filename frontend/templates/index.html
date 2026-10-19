@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}SmartForest — AI Forest Monitoring System{% endblock %}
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg-particles" id="hero-particles"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🌿 Final Year CSE Project · AI-Powered</div>
+    <h1 class="hero-title">
+      Smart Forest<br>
+      <span class="gradient-text">Geo-Fencing & Emergency</span><br>
+      Monitoring System
+    </h1>
+    <p class="hero-desc">
+      Real-time forest surveillance powered by <strong>custom-built neural networks</strong> — trained from scratch.
+      AI-based person detection, face identification, GPS geo-fencing, and instant SOS emergency alerts.
+    </p>
+    <div class="hero-cta">
+      <a href="/register" class="btn btn-primary btn-lg">
+        <span>👤</span> Sign Up &amp; Enter Forest
+      </a>
+      <a href="/login" class="btn btn-outline btn-lg">
+        <span>🔑</span> Sign In
+      </a>
+    </div>
+    <div class="hero-cta" style="margin-top: 12px;">
+      <a href="/officer#live-monitoring" class="btn btn-outline btn-lg" style="font-size: 0.9em;">
+        <span>📹</span> Live Monitor
+      </a>
+      <a href="/geofence" class="btn btn-outline btn-lg" style="font-size: 0.9em;">
+        <span>🗺️</span> Zone Map
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-monitor-card">
+      <div class="monitor-header">
+        <span class="status-dot pulse-green"></span>
+        <span>Live Detection Feed</span>
+        <span class="monitor-badge">AI ACTIVE</span>
+      </div>
+      <div class="monitor-grid">
+        <div class="monitor-stat">
+          <div class="stat-value" id="hero-persons">—</div>
+          <div class="stat-label">Persons Detected</div>
+        </div>
+        <div class="monitor-stat">
+          <div class="stat-value" id="hero-alerts">—</div>
+          <div class="stat-label">Active Alerts</div>
+        </div>
+        <div class="monitor-stat">
+          <div class="stat-value" id="hero-zones">—</div>
+          <div class="stat-label">Monitored Zones</div>
+        </div>
+        <div class="monitor-stat">
+          <div class="stat-value" id="hero-sos">—</div>
+          <div class="stat-label">Open SOS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section container">
+  <h2 class="section-title">System Capabilities</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🧠</div>
+      <h3>Custom AI — Zero Pretrained Weights</h3>
+      <p>ForestPersonNet and ForestFaceNet are built and trained entirely from scratch using Kaiming random initialization. No YOLO, FaceNet, or any pretrained checkpoints.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📹</div>
+      <h3>Real-Time Person Detection</h3>
+      <p>Webcam frames are analyzed by ForestPersonNet — a custom object-detection CNN — providing bounding boxes and confidence scores at inference time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👤</div>
+      <h3>Face Identification</h3>
+      <p>ForestFaceNet extracts 128-D face embeddings for registered forest personnel. Unknown individuals trigger immediate alerts to the command center.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🗺️</div>
+      <h3>GPS Geo-Fencing</h3>
+      <p>Browser GPS + Shapely polygon math enforce zone boundaries. Unauthorized entries into HIGH/CRITICAL zones produce instant SocketIO alerts.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🆘</div>
+      <h3>Emergency SOS System</h3>
+      <p>One-tap SOS broadcasts the user's GPS location, emergency type, and message to the admin command center via WebSocket in real time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Admin Command Center</h3>
+      <p>Live dashboard with detection history, alert management, SOS resolution, zone configuration, and user management.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack Section -->
+<section class="tech-section container">
+  <h2 class="section-title">Technology Stack</h2>
+  <div class="tech-chips">
+    <span class="tech-chip">Python 3.11</span>
+    <span class="tech-chip">PyTorch</span>
+    <span class="tech-chip">Flask</span>
+    <span class="tech-chip">Socket.IO</span>
+    <span class="tech-chip">MySQL</span>
+    <span class="tech-chip">SQLAlchemy</span>
+    <span class="tech-chip">OpenCV</span>
+    <span class="tech-chip">Shapely</span>
+    <span class="tech-chip">Leaflet.js</span>
+    <span class="tech-chip">JWT Auth</span>
+    <span class="tech-chip">Custom CNN</span>
+    <span class="tech-chip">bcrypt</span>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function loadHeroStats() {
+  try {
+    const res = await API.get("/api/admin/stats");
+    if (res.success) {
+      document.getElementById("hero-alerts").textContent = res.data.active_alerts ?? "—";
+      document.getElementById("hero-zones").textContent  = res.data.active_zones ?? "—";
+      document.getElementById("hero-sos").textContent    = res.data.open_sos_events ?? "—";
+    }
+  } catch(e) {}
+}
+loadHeroStats();
+</script>
+{% endblock %}

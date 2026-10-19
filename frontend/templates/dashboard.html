@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Forest — Officer Command Dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Interactive Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+
+<!-- Left Navigation Sidebar -->
+<aside>
+  <div class="brand">🌲 <b>SMART FOREST</b></div>
+  <div class="sub">OFFLINE AI PERIMETER DEFENSE</div>
+
+  <nav>
+    <a href="#overview">📊 Command Overview</a>
+    <a href="#live-monitoring">📹 Live Monitoring</a>
+    <a href="#geofence-map">🗺️ Geo-Fence Map</a>
+    <a href="#registered-people">👥 Registered People</a>
+    <a href="#sos-log">🚨 SOS Response Log</a>
+    <a href="/register" class="nav-primary">➕ Register Visitor</a>
+  </nav>
+
+  <button class="darkbtn" onclick="resetPerimeterTracker()">
+    🔄 Reset Perimeter Tracker
+  </button>
+</aside>
+
+<!-- Main Command Content -->
+<main>
+  <!-- Header -->
+  <header id="overview">
+    <div>
+      <h1>Smart Forest Perimeter Command</h1>
+      <small>OFFLINE AI MONITORING • REAL-TIME BIOMETRICS & GEO-FENCING</small>
+    </div>
+    <div class="header-right">
+      <span class="online">● SYSTEM ONLINE</span>
+      <button id="btn-audio-toggle" class="top-link" onclick="toggleDashboardAudio()" title="Click to test or toggle audio alerts" style="background:#132a1e; color:#4ade80; border:1px solid #2e573e; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; gap:6px; border-radius:6px; padding:6px 12px;">
+        🔊 Audio Beep: ON
+      </button>
+      <a href="/register" class="top-link primary">Visitor Portal →</a>
+    </div>
+  </header>
+
+  <!-- Metric Overview Cards -->
+  <div class="cards">
+    <div>
+      <span>Active Enrolled Visitors</span>
+      <strong id="metric-visitors">0</strong>
+    </div>
+    <div>
+      <span>Restricted Zone Incursions</span>
+      <strong id="metric-incursions">0</strong>
+    </div>
+    <div>
+      <span>Emergency SOS Alerts</span>
+      <strong id="metric-sos">0</strong>
+    </div>
+    <div>
+      <span>AI Model Status</span>
+      <strong id="metric-ai-status" style="font-size:20px; color:#19733b;">ForestFaceNet Active</strong>
+    </div>
+  </div>
+
+  <!-- Live Perimeter Monitoring Section -->
+  <section id="live-monitoring">
+    <div class="sectionhead">
+      <div>
+        <h2>Perimeter Zone Detection</h2>
+        <p>Real-time video feed analyzed by custom offline ForestPersonNet & ForestFaceNet (Conservative Margin & 1-to-1 Locking)</p>
+      </div>
+      <div>
+        <button id="btn-toggle-cam" class="primary" onclick="toggleCamera()">
+          📹 Start Live Feed
+        </button>
+      </div>
+    </div>
+
+    <div class="cameraGrid">
+      <div class="video">
+        <video id="officer-video" autoplay playsinline muted style="display:none;"></video>
+        <canvas id="officer-canvas"></canvas>
+        <div id="msg">Live Camera Offline — Click 'Start Live Feed'</div>
+        <div class="zoneLabel za">ZONE A<br><small>Public Eco-Trail</small></div>
+        <div class="zoneLabel zb">ZONE B<br><small>Buffer Ridge</small></div>
+        <div class="zoneLabel zc">ZONE C<br><small>Restricted Core</small></div>
+      </div>
+
+      <div class="statusbox">
+        <h2>Real-Time Telemetry</h2>
+        <div class="line">
+          <span>Dominant Zone</span>
+          <b id="tel-zone">—</b>
+        </div>
+        <div class="line">
+          <span>Detected Persons</span>
+          <b id="tel-count">0</b>
+        </div>
+        <div class="line">
+          <span>Registered Identified</span>
+          <b id="tel-reg-count">0</b>
+        </div>
+        <div class="line">
+          <span>Active Cached Profiles</span>
+          <b id="tel-enrolled">0</b>
+        </div>
+        <div class="line">
+          <span>FPS / Cycle Rate</span>
+          <b id="tel-fps">0.0 fps</b>
+        </div>
+        <div id="tel-status-banner" class="ok">
+          Perimeter Secure • No Intrusions
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Live People Grid -->
+    <h3 style="margin:24px 0 10px; color:#10291b;">Active Targets in Camera Scope</h3>
+    <div class="live-people-grid" id="live-people-container">
+      <div class="empty-people-notice">
+        No active targets detected in camera field. Start live feed to begin perimeter analysis.
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Leaflet Forest Geo-Fence Map Section -->
+  <section id="geofence-map">
+    <div class="sectionhead">
+      <div>
+        <h2>🗺️ Smart Forest Geo-Fence & Real-Time GPS Tracking</h2>
+        <p>Real GPS coordinates evaluated via Shapely Point-in-Polygon against forest risk boundaries</p>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button type="button" id="btn-toggle-officer-gps" class="primary" style="padding:7px 14px; font-size:13px; background:#16a34a; border-color:#16a34a;" onclick="toggleOfficerLiveGPS()">
+          📍 Track My Live GPS
+        </button>
+        <button type="button" id="btn-center-user" class="darkbtn" style="padding:7px 14px; font-size:13px;" onclick="centerOnUserLocation()">
+          🎯 Center on Me
+        </button>
+        <button type="button" id="btn-center-forest" class="darkbtn" style="padding:7px 14px; font-size:13px;" onclick="centerOnForestReserve()">
+          🌲 Forest Bounds
+        </button>
+        <button type="button" class="darkbtn" style="padding:7px 14px; font-size:13px;" onclick="refreshMapData()">
+          🔄 Refresh Map
+        </button>
+      </div>
+    </div>
+
+    <!-- Real-Time Device GPS Telemetry Bar -->
+    <div id="officer-gps-banner" style="background:#f8faf9; border:1px solid #cce3d3; border-radius:10px; padding:12px 16px; margin-top:14px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span id="officer-gps-status-dot" style="width:12px; height:12px; border-radius:50%; background:#94a3b8; display:inline-block; transition:all 0.3s ease;"></span>
+        <div>
+          <div style="font-size:11px; font-weight:800; color:#5f7365; text-transform:uppercase; letter-spacing:0.5px;">Device GPS Status</div>
+          <div id="officer-gps-status-text" style="font-size:13px; font-weight:700; color:#10291b;">GPS Idle — Click 'Track My Live GPS' to activate</div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:16px; font-size:13px; align-items:center;">
+        <div>
+          <span style="color:#5f7365; display:block; font-size:11px; font-weight:700;">COORDINATES</span>
+          <span id="officer-coords-display" style="font-family:monospace; font-weight:700; color:#0f766e;">—</span>
+        </div>
+        <div>
+          <span style="color:#5f7365; display:block; font-size:11px; font-weight:700;">ACCURACY</span>
+          <span id="officer-accuracy-display" style="font-family:monospace; font-weight:700; color:#10291b;">—</span>
+        </div>
+        <div>
+          <span style="color:#5f7365; display:block; font-size:11px; font-weight:700;">CURRENT ZONE</span>
+          <span id="officer-zone-display" style="font-weight:700; color:#10291b;">—</span>
+        </div>
+        <div>
+          <span style="color:#5f7365; display:block; font-size:11px; font-weight:700;">RISK LEVEL</span>
+          <span id="officer-risk-display" style="background:#e2e8f0; color:#64748b; font-weight:700; padding:2px 8px; border-radius:4px; font-size:12px;">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#fff; border-radius:12px; border:1px solid #d0ded3; padding:16px; margin-top:10px;">
+      <div id="forest-map" style="height: 480px; border-radius: 8px; z-index: 1;"></div>
+      <div style="display:flex; flex-wrap:wrap; gap:18px; margin-top:14px; font-size:13px; font-weight:600;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="width:14px; height:14px; border-radius:3px; background:#22c55e; display:inline-block;"></span>
+          <span>LOW — Safe Visitor Eco-Trail</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="width:14px; height:14px; border-radius:3px; background:#f59e0b; display:inline-block;"></span>
+          <span>MEDIUM — Pine Ridge Buffer</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="width:14px; height:14px; border-radius:3px; background:#ef4444; display:inline-block;"></span>
+          <span>HIGH — Wild Elephant Corridor</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="width:14px; height:14px; border-radius:3px; background:#7c3aed; display:inline-block;"></span>
+          <span>CRITICAL — Blackwood Gorge</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="width:12px; height:12px; border-radius:50%; background:#2563eb; display:inline-block; border:2px solid #fff;"></span>
+          <span>Visitor Marker (Registered User)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="width:12px; height:12px; border-radius:50%; background:#0284c7; display:inline-block; border:2px solid #38bdf8; box-shadow:0 0 0 2px rgba(2,132,199,0.4);"></span>
+          <span>Officer Device (Live GPS)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Registered People Management Section -->
+  <section id="registered-people">
+    <div class="sectionhead">
+      <div>
+        <h2>👥 Registered People Management</h2>
+        <p>Manage enrolled identities, multi-photo face samples, status, and recognition index</p>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button type="button" class="primary" style="padding:7px 14px; font-size:13px;" onclick="refreshRecognitionCache()">
+          ⚡ Refresh Recognition Cache
+        </button>
+        <a href="/api/export-registry" class="top-link primary">📥 Export CSV</a>
+      </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="filter-bar">
+      <input type="text" id="registry-search" class="filter-input" placeholder="🔍 Search by name or unique ID..." oninput="filterPeopleTable()">
+      <select id="registry-filter-status" class="filter-select" onchange="filterPeopleTable()">
+        <option value="ALL">All Statuses</option>
+        <option value="ACTIVE">Active Only</option>
+        <option value="DISABLED">Disabled Only</option>
+        <option value="SOS">SOS Triggered</option>
+      </select>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="reg-table" id="table-registrations">
+        <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Unique ID</th>
+            <th>Contact</th>
+            <th>Face Samples</th>
+            <th>Current Zone</th>
+            <th>Status</th>
+            <th>Registered At</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="registrations-tbody">
+          <tr><td colspan="9" style="text-align:center; color:#6d786f;">Loading registered people...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Emergency SOS Log Section -->
+  <section id="sos-log">
+    <div class="sectionhead">
+      <div>
+        <h2>Emergency SOS Alerts</h2>
+        <p>Emergency beacon signals, GPS coordinates, and 5-second video uploads</p>
+      </div>
+    </div>
+    <div id="sos-alerts-container">
+      <p style="color:#6d786f; margin:10px 0;">No active emergency beacons.</p>
+    </div>
+  </section>
+
+  <footer>
+    🌲 Smart Forest Offline AI Perimeter Command • Custom ForestFaceNet & ForestPersonNet • Real Photographic Grounding
+  </footer>
+</main>
+
+<!-- Emergency SOS Video Playback Modal -->
+<div id="sos-modal" class="sos-modal-overlay">
+  <div class="sos-modal-content">
+    <div class="sos-header">
+      <h3 id="modal-sos-title" style="margin:0;">🚨 Emergency Video Clip</h3>
+      <button type="button" onclick="closeSOSModal()" style="background:none; border:none; font-size:22px; cursor:pointer; font-weight:700; color:#a32118;">✕</button>
+    </div>
+    <div class="sos-body">
+      <p id="modal-sos-meta" style="margin:0 0 10px; color:#5f7365; font-size:14px;"></p>
+      <video id="modal-sos-video" class="sos-video-player" controls autoplay></video>
+    </div>
+  </div>
+</div>
+
+<!-- Permanent Deletion Confirmation Modal -->
+<div id="delete-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="margin:0;">⚠️ Confirm Permanent Deletion</h3>
+      <button type="button" onclick="closeDeleteModal()" style="background:none; border:none; font-size:22px; cursor:pointer; font-weight:700; color:#a32118;">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:15px; margin:0 0 12px; color:#163321;">
+        Are you sure you want to permanently delete <strong id="delete-modal-name"></strong> (<code id="delete-modal-uid"></code>)?
+      </p>
+      <div style="background:#fff3f0; border-left:4px solid #d93025; padding:12px; border-radius:6px; font-size:13px; color:#a32118;">
+        <b>This action is irreversible. The system will:</b>
+        <ul style="margin:8px 0 0 18px; padding:0;">
+          <li>Delete database profile and visitor pass</li>
+          <li>Delete all biometric face embeddings and centroid vectors</li>
+          <li>Delete all enrollment photographs from disk storage</li>
+          <li>Invalidate and reload the active recognition cache</li>
+          <li>Ensure this person can never be recognized again</li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" onclick="closeDeleteModal()">Cancel</button>
+      <button type="button" id="btn-confirm-delete" class="dangerbtn" onclick="executeDeleteVisitor()">
+        🗑️ Permanently Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/sound_alerts.js"></script>
+<script src="/static/js/officer.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Emergency SOS — SmartForest{% endblock %}
+{% block body_class %}sos-page{% endblock %}
+
+{% block content %}
+<div class="page-header sos-header-danger">
+  <h1>🆘 Visitor Emergency Distress Beacon</h1>
+  <p>Send your real-time GPS location and emergency type directly to the Forest Ranger Command Center</p>
+</div>
+
+<div style="max-width:1100px; margin:0 auto 12px; display:flex; justify-content:flex-end;">
+  <a href="/officer#sos-log" style="color:#0f766e; font-size:13px; font-weight:700; text-decoration:none; background:#e6f4ea; padding:6px 12px; border-radius:6px; border:1px solid #c2e2cc;">
+    👮 Forest Ranger on Duty? Open Incident SOS Console →
+  </a>
+</div>
+
+<div class="sos-layout">
+  <!-- SOS Trigger Card -->
+  <div class="sos-main-card card">
+    <!-- Big SOS Button -->
+    <div class="sos-button-zone">
+      <button class="sos-big-btn" id="main-sos-btn" type="button">
+        <span class="sos-btn-icon">🆘</span>
+        <span class="sos-btn-label">SEND SOS</span>
+        <span class="sos-btn-sub">Hold 2 seconds to confirm</span>
+      </button>
+    </div>
+
+    <form id="sos-form" class="sos-form">
+      <div class="form-group">
+        <label>Emergency Type</label>
+        <div class="emergency-type-grid">
+          <button type="button" class="emergency-type-btn" data-type="INJURY">🤕 Injury</button>
+          <button type="button" class="emergency-type-btn" data-type="WILD_ANIMAL">🐘 Wild Animal</button>
+          <button type="button" class="emergency-type-btn" data-type="LOST">🧭 Lost / Stranded</button>
+          <button type="button" class="emergency-type-btn" data-type="FIRE">🔥 Forest Fire</button>
+          <button type="button" class="emergency-type-btn active" data-type="OTHER">⚠️ Other</button>
+        </div>
+        <input type="hidden" id="sos-type" value="OTHER">
+      </div>
+      <div class="form-group">
+        <label for="sos-message">Additional Message (Optional)</label>
+        <textarea id="sos-message" placeholder="Describe your situation briefly..." rows="3" maxlength="300"></textarea>
+      </div>
+      <div class="form-group">
+        <label>GPS Coordinates</label>
+        <div class="gps-status-row">
+          <span id="sos-gps-status" class="status-badge badge-inactive">Not acquired</span>
+          <button type="button" class="btn btn-outline btn-sm" id="get-sos-location-btn">📍 Get My Location</button>
+        </div>
+        <div id="sos-location-display" class="sos-coords-display">
+          <span id="sos-lat-display">Lat: —</span>
+          <span id="sos-lon-display">Lon: —</span>
+        </div>
+        <input type="hidden" id="sos-lat">
+        <input type="hidden" id="sos-lon">
+      </div>
+      <div id="sos-result" class="form-success-banner hidden"></div>
+      <div id="sos-error" class="form-error-banner hidden"></div>
+    </form>
+  </div>
+
+  <!-- SOS History -->
+  <div class="sos-history-panel card">
+    <h3>📜 Your SOS History</h3>
+    <div id="sos-history-list" class="sos-history-list">
+      <p class="no-data-hint">No SOS events yet.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/sos.js') }}"></script>
+{% endblock %}

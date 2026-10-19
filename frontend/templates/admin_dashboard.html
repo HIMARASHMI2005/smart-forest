@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Admin Command Center — SmartForest{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>🛡️ Admin Command Center</h1>
+  <p>Real-time forest monitoring dashboard — Live alerts, SOS events, detections</p>
+  <div class="realtime-indicator">
+    <span class="status-dot pulse-green"></span>
+    <span id="socket-status">Connecting...</span>
+  </div>
+</div>
+
+<!-- System Statistics Row -->
+<div class="stats-grid" id="stats-grid">
+  <div class="stat-card stat-card--blue">
+    <div class="stat-icon">👥</div>
+    <div class="stat-val" id="stat-users">—</div>
+    <div class="stat-name">Total Users</div>
+  </div>
+  <div class="stat-card stat-card--red">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-val" id="stat-alerts">—</div>
+    <div class="stat-name">Active Alerts</div>
+  </div>
+  <div class="stat-card stat-card--orange">
+    <div class="stat-icon">🆘</div>
+    <div class="stat-val" id="stat-sos">—</div>
+    <div class="stat-name">Open SOS</div>
+  </div>
+  <div class="stat-card stat-card--green">
+    <div class="stat-icon">🌲</div>
+    <div class="stat-val" id="stat-zones">—</div>
+    <div class="stat-name">Active Zones</div>
+  </div>
+  <div class="stat-card stat-card--purple">
+    <div class="stat-icon">🎯</div>
+    <div class="stat-val" id="stat-detections">—</div>
+    <div class="stat-name">Total Detections</div>
+  </div>
+  <div class="stat-card stat-card--dark">
+    <div class="stat-icon">🕵️</div>
+    <div class="stat-val" id="stat-unknown">—</div>
+    <div class="stat-name">Unknown Detections</div>
+  </div>
+</div>
+
+<!-- Dashboard Panels -->
+<div class="admin-grid">
+  <!-- Live SOS Events -->
+  <div class="card admin-panel">
+    <div class="panel-header">
+      <h3>🆘 Live SOS Events</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadSOSEvents()">↻ Refresh</button>
+    </div>
+    <div id="sos-panel" class="admin-list-panel">
+      <p class="no-data-hint">Loading SOS events...</p>
+    </div>
+  </div>
+
+  <!-- Active Alerts -->
+  <div class="card admin-panel">
+    <div class="panel-header">
+      <h3>⚠️ Active Alerts</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadAlerts()">↻ Refresh</button>
+    </div>
+    <div id="alerts-panel" class="admin-list-panel">
+      <p class="no-data-hint">Loading alerts...</p>
+    </div>
+  </div>
+
+  <!-- Recent Detections -->
+  <div class="card admin-panel">
+    <div class="panel-header">
+      <h3>🎯 Recent Detections</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadDetections()">↻ Refresh</button>
+    </div>
+    <div id="detections-panel" class="admin-list-panel">
+      <p class="no-data-hint">Loading detections...</p>
+    </div>
+  </div>
+
+  <!-- User Management -->
+  <div class="card admin-panel">
+    <div class="panel-header">
+      <h3>👥 Registered Users</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadUsers()">↻ Refresh</button>
+    </div>
+    <div id="users-panel" class="admin-list-panel">
+      <p class="no-data-hint">Loading users...</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

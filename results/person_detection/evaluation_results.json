@@ -1,0 +1,11 @@
+{
+  "true_positives": 16,
+  "false_positives": 458,
+  "false_negatives": 131,
+  "precision": 0.0338,
+  "recall": 0.1088,
+  "f1_score": 0.0515,
+  "mean_iou": 0.5672,
+  "map_50": 0.0713,
+  "test_images_count": 80
+}

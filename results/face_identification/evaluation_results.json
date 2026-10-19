@@ -1,0 +1,8 @@
+{
+  "accuracy_pct": 100.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "test_samples": 250,
+  "num_classes": 5
+}

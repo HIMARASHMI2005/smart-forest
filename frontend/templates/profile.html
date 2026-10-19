@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}My Profile — SmartForest{% endblock %}
+{% block body_class %}profile-page{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin: 40px auto; padding: 0 20px;">
+  <div class="auth-card" style="padding: 32px;">
+    <div class="auth-header" style="margin-bottom: 24px;">
+      <div class="auth-logo">👤</div>
+      <h1 style="font-size: 1.6em;">My Forest Profile</h1>
+      <p>Your registered Smart Forest account details</p>
+    </div>
+
+    <div id="profile-loading" style="text-align:center; color:#6d786f; padding:20px;">
+      Loading profile...
+    </div>
+
+    <div id="profile-content" style="display:none;">
+      <!-- Forest ID Card -->
+      <div style="background: linear-gradient(135deg, #0d4f22 0%, #1a7a3a 100%); color:#fff; border-radius:16px; padding:24px; margin-bottom:24px;">
+        <div style="font-size:11px; letter-spacing:1.5px; opacity:0.8;">FOREST USER ID</div>
+        <div id="prof-forest-id" style="font-size:28px; font-weight:800; letter-spacing:2px; margin:4px 0;">FOR-0000</div>
+        <div style="display:flex; justify-content:space-between; margin-top:16px;">
+          <div>
+            <div style="font-size:11px; opacity:0.7;">NAME</div>
+            <div id="prof-name" style="font-weight:600; font-size:16px;">--</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px; opacity:0.7;">STATUS</div>
+            <div id="prof-status" style="font-weight:700; color:#72f796;">ACTIVE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div style="display:grid; gap:16px;">
+        <div class="form-group">
+          <label style="font-weight:600; color:#10291b;">📧 Email</label>
+          <div id="prof-email" style="padding:10px 14px; background:#f0f7f1; border-radius:8px; color:#163321;">--</div>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; color:#10291b;">📱 Phone</label>
+          <div id="prof-phone" style="padding:10px 14px; background:#f0f7f1; border-radius:8px; color:#163321;">--</div>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; color:#10291b;">🚨 Emergency Contact</label>
+          <div id="prof-emergency" style="padding:10px 14px; background:#f0f7f1; border-radius:8px; color:#163321;">--</div>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; color:#10291b;">🔐 Role</label>
+          <div id="prof-role" style="padding:10px 14px; background:#f0f7f1; border-radius:8px; color:#163321;">--</div>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; color:#10291b;">📸 Face Biometric</label>
+          <div id="prof-face" style="padding:10px 14px; background:#f0f7f1; border-radius:8px; color:#163321;">--</div>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; color:#10291b;">📅 Registered</label>
+          <div id="prof-created" style="padding:10px 14px; background:#f0f7f1; border-radius:8px; color:#163321;">--</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <a href="/geofence" class="btn btn-primary" style="text-align:center; padding:12px;">🗺️ Geo-Fence Map</a>
+        <a href="/sos" class="btn btn-outline" style="text-align:center; padding:12px;">🆘 SOS Page</a>
+      </div>
+    </div>
+
+    <div id="profile-no-auth" style="display:none; text-align:center; padding:20px;">
+      <p style="color:#6d786f; font-size:15px;">You are not signed in.</p>
+      <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+        <a href="/login" class="btn btn-primary">Sign In</a>
+        <a href="/register" class="btn btn-outline">Create Account</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(async function loadProfile() {
+    const token = Auth.getToken();
+    if (!token) {
+        document.getElementById("profile-loading").style.display = "none";
+        document.getElementById("profile-no-auth").style.display = "block";
+        return;
+    }
+
+    try {
+        const res = await API.get("/api/auth/me");
+        if (res.success && res.data && res.data.user) {
+            const u = res.data.user;
+            document.getElementById("prof-forest-id").textContent = u.forest_user_id || u.unique_id || "—";
+            document.getElementById("prof-name").textContent = u.name || "—";
+            document.getElementById("prof-email").textContent = u.email || "—";
+            document.getElementById("prof-phone").textContent = u.phone || "—";
+            document.getElementById("prof-emergency").textContent = u.emergency_contact || "Not set";
+            document.getElementById("prof-role").textContent = u.role || "USER";
+            document.getElementById("prof-status").textContent = u.status || "ACTIVE";
+            document.getElementById("prof-face").textContent = u.has_face_registered ? "✅ Enrolled" : "❌ Not enrolled";
+            document.getElementById("prof-created").textContent = u.created_at || "—";
+
+            document.getElementById("profile-loading").style.display = "none";
+            document.getElementById("profile-content").style.display = "block";
+        } else {
+            document.getElementById("profile-loading").style.display = "none";
+            document.getElementById("profile-no-auth").style.display = "block";
+        }
+    } catch (e) {
+        document.getElementById("profile-loading").style.display = "none";
+        document.getElementById("profile-no-auth").style.display = "block";
+    }
+})();
+</script>
+{% endblock %}

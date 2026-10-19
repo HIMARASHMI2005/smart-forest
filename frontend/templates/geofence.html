@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Smart Forest Geo-Fence & Real-Time GPS Tracking{% endblock %}
+{% block body_class %}map-page{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>🗺️ Smart Forest Geo-Fence & Real-Time GPS Tracking</h1>
+  <p>Live device GPS tracking with interactive forest boundary safety & risk monitoring</p>
+</div>
+
+<div class="map-layout">
+  <!-- Map Container -->
+  <div class="map-wrapper card">
+    <div id="forest-map" style="height: 600px; border-radius: 12px;"></div>
+    <div class="map-legend">
+      <h4>Map Legend</h4>
+      <div class="legend-row"><span class="legend-dot" style="background:#3b82f6"></span>📍 Registered Person (Live GPS)</div>
+      <div class="legend-row"><span class="legend-dot" style="background:#22c55e"></span>🌲 Low Risk Zone (Safe Access)</div>
+      <div class="legend-row"><span class="legend-dot" style="background:#f59e0b"></span>🟠 Medium Risk Zone (Caution Required)</div>
+      <div class="legend-row"><span class="legend-dot" style="background:#ef4444"></span>🔴 High Risk Zone (Restricted Entry)</div>
+      <div class="legend-row"><span class="legend-dot" style="background:#7c3aed"></span>🟣 Critical Zone (No Entry)</div>
+      <div class="legend-row"><span class="legend-dot" style="background:#dc2626"></span>🚨 SOS Emergency Location</div>
+    </div>
+  </div>
+
+  <!-- Zone Info Sidebar -->
+  <div class="zone-sidebar">
+    <!-- YOUR LIVE LOCATION CARD -->
+    <div class="card" id="live-location-card" style="border-left: 4px solid #3b82f6;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="margin:0; font-size:1.15rem; color:#e2e8f0;">📍 YOUR LIVE LOCATION</h3>
+        <span id="live-gps-status" class="badge" style="background:#3b82f622; color:#60a5fa; font-weight:700;">⚠️ Acquiring GPS</span>
+      </div>
+
+      <div id="gps-error-alert" style="display:none; background:#7f1d1d33; border:1px solid #ef4444; border-radius:8px; padding:10px; margin-bottom:12px; color:#fca5a5; font-size:0.85rem;"></div>
+
+      <div class="zone-info-box" style="margin-top:0;">
+        <div class="loc-row"><span>User Name:</span><strong id="live-user-name">Registered User</strong></div>
+        <div class="loc-row"><span>Latitude:</span><strong id="live-lat" style="font-family:monospace; color:#38bdf8;">—</strong></div>
+        <div class="loc-row"><span>Longitude:</span><strong id="live-lon" style="font-family:monospace; color:#38bdf8;">—</strong></div>
+        <div class="loc-row"><span>Accuracy:</span><span id="live-accuracy" style="font-family:monospace;">—</span></div>
+        <div class="loc-row"><span>Current Forest Zone:</span><strong id="live-zone" style="color:#f1f5f9;">—</strong></div>
+        <div class="loc-row"><span>Risk Level:</span><span id="live-risk" class="badge" style="background:#22c55e22; color:#22c55e; font-weight:700;">—</span></div>
+        <div class="loc-row"><span>Last Updated:</span><span id="live-updated" style="color:#94a3b8; font-size:0.8rem;">—</span></div>
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:8px;">
+        <button class="btn btn-primary btn-sm" id="btn-recenter" style="flex:1;">🎯 Center on My Location</button>
+      </div>
+    </div>
+
+    <!-- ACTIVE FOREST ZONES -->
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-top:0;">🌲 Active Forest Zones</h3>
+      <div id="zones-list" class="zones-list" style="max-height:280px; overflow-y:auto;">
+        <p class="no-data-hint">Loading zones...</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/geofence.js') }}"></script>
+{% endblock %}
